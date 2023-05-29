@@ -1,6 +1,7 @@
 from sqlalchemy.orm import sessionmaker
 from models import *
 import json
+from tabulate import tabulate
 
 
 class DbHandler:
@@ -39,16 +40,19 @@ class DbHandler:
                 model(id=record.get('pk'), **record.get('fields')))
         self.__s.commit()
 
-    def find_sales(self, publisher_id: str = None,
-                   publisher_name: str = None) -> list:
-        if publisher_id:
-            return self.__s.query(Book.title, Shop.name, Sale.price,
-                                  Sale.date_sale).join(Publisher).join(
-                Stock).join(Shop).join(Sale).filter(
-                Publisher.id == publisher_id).all()
+    def find_sales(self, id_or_name: int or str) -> None:
+        select_all = self.__s.query(Book.title, Shop.name, Sale.price,
+                                    Sale.date_sale).join(Publisher).join(
+            Stock).join(Shop).join(Sale)
 
-        if publisher_name:
-            return self.__s.query(Book.title, Shop.name, Sale.price,
-                                  Sale.date_sale).join(Publisher).join(
-                Stock).join(Shop).join(Sale).filter(
-                Publisher.name == publisher_name).all()
+        if type(id_or_name) is int:
+            search = select_all.filter(
+                Publisher.id == id_or_name).all()
+        elif type(id_or_name) is str:
+            search = select_all.filter(
+                Publisher.name == id_or_name).all()
+        else:
+            raise TypeError("Please provide string or integer")
+
+        headers = ('Book name', 'Publisher', 'Price', 'Date')
+        print(tabulate(search, headers, 'presto', numalign='left'))
