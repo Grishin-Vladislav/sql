@@ -1,0 +1,5 @@
+greenlet==2.0.2
+psycopg2-binary==2.9.6
+SQLAlchemy==2.0.15
+tabulate @ file:///work/ci_py311/tabulate_1676838830728/work
+typing_extensions==4.5.0
